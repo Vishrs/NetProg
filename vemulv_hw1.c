@@ -1,6 +1,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
-
+#include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -17,20 +17,22 @@ int main(int argc, char * argv[]) {
         return EXIT_FAILURE;
     }
     
-    char ownPeerID[80] = argv[2];
-    ownPeerID[strlen(ownPeerID)] = '\0';
+    char ownPeerID[80];
+    strcpy(ownPeerID, argv[2]); //char ownPeerID[80] = argv[2];
+   // ownPeerID[strlen(ownPeerID)] = '\0';
     
-    char registerID[80];
+    char registerID[80] = "REGISTER ";
     
-    strcat("register ", ownPeerID);
-    
+    strcat(registerID, ownPeerID);
+    registerID[strlen(registerID)] = '\0';
+    printf("%s\n", registerID);
     struct sockaddr_in server;
     struct addrinfo adrinfo;
-    struct addrinfo adrresults;
+    struct addrinfo *adrresults;
     
-    int sd, length;
+    int sd;
     
-    if((sd = socket( AF_INET6, SOCK_DGRAM) < 0) {
+    if((sd = socket( AF_INET6, SOCK_DGRAM, 0)) < 0) {
         perror("socket failed\n");
         return EXIT_FAILURE;
     }
@@ -51,6 +53,11 @@ int main(int argc, char * argv[]) {
         return EXIT_FAILURE;
     }
     
+    int snd = sendto(sd, registerID, strlen(registerID), 0, adrresults->ai_addr, adrresults->ai_addrlen);
+    if (snd < 0) {
+        printf("ERROR: sendto() failed\n");
+        return EXIT_FAILURE;
+    }
     
     return EXIT_SUCCESS;
     
