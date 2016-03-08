@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
+#define PORT "12345"
 
 int main(int argc, char * argv[]) {
     
@@ -15,6 +16,13 @@ int main(int argc, char * argv[]) {
         printf("USAGE: : ./a.out <rendezvous server address> <your peer ID> <contact peer ID> <message>\n");
         return EXIT_FAILURE;
     }
+    
+    char ownPeerID[80] = argv[2];
+    ownPeerID[strlen(ownPeerID)] = '\0';
+    
+    char registerID[80];
+    
+    strcat("register ", ownPeerID);
     
     struct sockaddr_in server;
     struct addrinfo adrinfo;
@@ -36,7 +44,7 @@ int main(int argc, char * argv[]) {
     adrinfo.ai_socktype = SOCK_DGRAM;
     adrinfo.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
     
-    int rend_info = getaddrinfo(argv[1], "12345", &adrinfo, &adrresults);
+    int rend_info = getaddrinfo(argv[1], PORT, &adrinfo, &adrresults);
     
     if (rend_info < 0) {
         perror("getaddrinfo() failed\n");
